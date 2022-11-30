@@ -21,13 +21,17 @@ bool SimpleTransferServer::HandleClient()
 
     try
     {
-        file.open(std::string{"c:\\temp\\channel_sounding.bin"});
+        file.open(std::string{"c:\\temp\\iqmeasure\\capture.bin"}, std::ios_base::binary);
         for(;;)
         {
             int res = recv(mClientSocketHandle, mReceiverBuffer, 65536, 0);
             if (res > 0)
             {
                 file.write(mReceiverBuffer, res);
+            }
+            else
+            {
+                break;
             }
         }
         file.close();
