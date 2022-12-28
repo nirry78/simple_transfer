@@ -137,14 +137,14 @@ int SimpleTransferServer::Run(int argc, char **argv)
         {
             try
             {
-                std::shared_ptr<SimpleTransferConnection> simpleConnection = 
+                std::shared_ptr<SimpleTransferConnection> simpleConnection =
                     std::make_shared<SimpleTransferConnection>(mClientSocketHandle, this);
 
                 Log(LOG_INFO, "Incoming connection");
 
                 mConnectionList.push_back(simpleConnection);
             }
-            catch(const std::bad_alloc& e)
+            catch(const std::bad_alloc&)
             {
                 shutdown(mClientSocketHandle, PLATFORM_BOTH_DIRECTIONS);
                 PlatformCloseSocket(mClientSocketHandle);

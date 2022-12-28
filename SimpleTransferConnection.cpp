@@ -1,10 +1,10 @@
 #include "SimpleTransferConnection.h"
 
-SimpleTransferConnection::SimpleTransferConnection(PlatformSocketType socketHandle, 
+SimpleTransferConnection::SimpleTransferConnection(PlatformSocketType socketHandle,
                                                    SimpleTransferConnectionCallback *callback):
-    mSocketHandle(socketHandle), 
-    mCallback(callback), 
-    mReceiveOffset(0), 
+    mSocketHandle(socketHandle),
+    mCallback(callback),
+    mReceiveOffset(0),
     mReceiveLength(65536)
 {
     std::cout << "SimpleTransferConnection::Init (socketHandle: " << socketHandle << ")" << std::endl;
@@ -12,7 +12,7 @@ SimpleTransferConnection::SimpleTransferConnection(PlatformSocketType socketHand
     mReceiveBuffer = std::make_unique<char[]>(mReceiveLength);
 
     mThread = std::make_unique<std::thread>([](SimpleTransferConnection *obj) {
-        obj->ProcessSocket();   
+        obj->ProcessSocket();
     }, this);
 }
 
@@ -34,9 +34,9 @@ void SimpleTransferConnection::ProcessSocket()
     Log(LOG_INFO, "Connection thread is running (socketHandle: %d)", mSocketHandle);
     for (;;)
     {
-        ssize_t res = recv(mSocketHandle, 
-                           mReceiveBuffer.get() + mReceiveOffset, 
-                           mReceiveLength - mReceiveOffset - 1, 0);
+        PlatformRecvResult res = recv(mSocketHandle,
+                                      mReceiveBuffer.get() + mReceiveOffset,
+                                      mReceiveLength - mReceiveOffset - 1, 0);
         if (res > 0)
         {
             mReceiveOffset += res;

@@ -12,6 +12,7 @@
 #endif
 
 #include <stdarg.h>
+#include <stdint.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -24,18 +25,21 @@ typedef SOCKET PlatformSocketType;
 #define PLATFORM_INVALID_SOCKET_HANDLE  INVALID_SOCKET
 #define PLATFORM_BOTH_DIRECTIONS        SD_BOTH
 #define PlatformCloseSocket(s)          closesocket(s)
-typedef int                             socklen_t; 
+typedef int                             socklen_t;
+typedef SSIZE_T                         ssize_t;
+typedef int                             PlatformRecvResult;
 #else
 typedef int PlatformSocketType;
 #define PLATFORM_INVALID_SOCKET_HANDLE  (-1)
 #define PLATFORM_BOTH_DIRECTIONS        SHUT_RDWR
 #define PlatformCloseSocket(s)          close(s)
+typedef ssize_t                         PlatformRecvResult;
 #endif
 
 typedef enum {
     LOG_ERROR,
-    LOG_INFO, 
-    LOG_VERBOSE, 
+    LOG_INFO,
+    LOG_VERBOSE,
 } PlatformErrorLevel;
 
 class Platform

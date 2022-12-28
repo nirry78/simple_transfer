@@ -16,8 +16,8 @@ class SimpleTransferConnection: public Platform
         SimpleTransferConnectionCallback   *mCallback;
         std::unique_ptr<std::thread>        mThread;
         std::unique_ptr<char[]>             mReceiveBuffer;
-        ssize_t                             mReceiveOffset;
-        ssize_t                             mReceiveLength;
+        PlatformRecvResult                  mReceiveOffset;
+        PlatformRecvResult                  mReceiveLength;
 
         void    ProcessSocket();
     public:
