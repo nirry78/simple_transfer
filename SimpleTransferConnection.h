@@ -3,12 +3,26 @@
 
 #include "Platform.h"
 
-class SimpleTransferConnection
+class SimpleTransferConnectionCallback
+{
+    public:
+        virtual void OnConnectionClose(std::shared_ptr<class SimpleTransferConnection>connection) = 0;
+};
+
+class SimpleTransferConnection: public Platform
 {
     private:
-        PlatformSocketType      mSocketHandle;
+        PlatformSocketType                  mSocketHandle;
+        SimpleTransferConnectionCallback   *mCallback;
+        std::unique_ptr<std::thread>        mThread;
+        std::unique_ptr<char[]>             mReceiveBuffer;
+        ssize_t                             mReceiveOffset;
+        ssize_t                             mReceiveLength;
+
+        void    ProcessSocket();
     public:
-                SimpleTransferConnection(PlatformSocketType socketHandle);
+                SimpleTransferConnection(PlatformSocketType socketHandle,
+                                         SimpleTransferConnectionCallback *callback = NULL);
         virtual ~SimpleTransferConnection();
 };
 

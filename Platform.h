@@ -11,11 +11,13 @@
 #include <netinet/ip.h>
 #endif
 
+#include <stdarg.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <list>
 #include <memory>
+#include <thread>
 
 #ifdef _WIN32
 typedef SOCKET PlatformSocketType;
@@ -30,16 +32,26 @@ typedef int PlatformSocketType;
 #define PlatformCloseSocket(s)          close(s)
 #endif
 
+typedef enum {
+    LOG_ERROR,
+    LOG_INFO, 
+    LOG_VERBOSE, 
+} PlatformErrorLevel;
+
 class Platform
 {
     private:
         static uint32_t initializeCount;
+        static bool     mVerboseOutput;
 
         static void     Startup();
         static void     Cleanup();
     public:
                         Platform();
         virtual         ~Platform();
+
+        void            Log(PlatformErrorLevel errorLevel, const char *format, ...);
+        void            SetVerbose();
 
 };
 

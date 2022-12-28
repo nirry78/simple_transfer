@@ -44,6 +44,11 @@ bool SimpleTransferServer::HandleClient()
     return result;
 }
 
+void SimpleTransferServer::OnConnectionClose(std::shared_ptr<class SimpleTransferConnection>connection)
+{
+    mConnectionList.remove(connection);
+}
+
 bool SimpleTransferServer::StartServer()
 {
     mSocketHandle = socket(AF_INET, SOCK_STREAM, 0);
@@ -99,6 +104,24 @@ int SimpleTransferServer::Run(int argc, char **argv)
 {
     int result = EXIT_SUCCESS;
 
+    for (auto index = 1; index < argc; index++)
+    {
+        if ((argv[index][0] == '/' || argv[index][0] == '-') && argv[index][1] != 0)
+        {
+            const char option = argv[index][1];
+
+            switch(option)
+            {
+                case 'v':
+                {
+                    SetVerbose();
+                    break;
+                }
+            }
+        }
+    }
+
+    Log(LOG_INFO, "Running server...");
     if (!StartServer())
     {
         return EXIT_FAILURE;
@@ -115,24 +138,21 @@ int SimpleTransferServer::Run(int argc, char **argv)
             try
             {
                 std::shared_ptr<SimpleTransferConnection> simpleConnection = 
-                    std::make_shared<SimpleTransferConnection>(mClientSocketHandle);
+                    std::make_shared<SimpleTransferConnection>(mClientSocketHandle, this);
+
+                Log(LOG_INFO, "Incoming connection");
 
                 mConnectionList.push_back(simpleConnection);
             }
             catch(const std::bad_alloc& e)
             {
-
+                shutdown(mClientSocketHandle, PLATFORM_BOTH_DIRECTIONS);
+                PlatformCloseSocket(mClientSocketHandle);
             }
             catch(const std::exception& e)
             {
                 std::cerr << e.what() << '\n';
             }
-            
-            std::cout << "Client connected" << std::endl;
-            HandleClient();
-            std::cout << "Client disconnected" << std::endl;
-            shutdown(mClientSocketHandle, PLATFORM_BOTH_DIRECTIONS);
-            PlatformCloseSocket(mClientSocketHandle);
         }
         else
         {
@@ -140,8 +160,6 @@ int SimpleTransferServer::Run(int argc, char **argv)
             return false;
         }
     }
-
-    std::cout << "Server initialized" << std::endl;
 
     return result;
 }

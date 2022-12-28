@@ -1,6 +1,7 @@
 #include "Platform.h"
 
 uint32_t Platform::initializeCount = 0;
+bool Platform::mVerboseOutput = false;
 
 Platform::Platform()
 {
@@ -33,6 +34,30 @@ void Platform::Cleanup()
 #endif
 }
 
+void Platform::SetVerbose()
+{
+    mVerboseOutput = true;
+}
+
+void Platform::Log(PlatformErrorLevel errorLevel, const char *format, ...)
+{
+    va_list va;
+
+    if (errorLevel < LOG_VERBOSE || mVerboseOutput)
+    {
+        char buffer[512];
+
+        va_start(va, format);
+        int pos = vsnprintf(buffer, 512, format, va);
+        va_end(va);
+
+        if (pos > 0)
+        {
+            buffer[pos] = 0;
+            std::cout << buffer << std::endl;
+        }
+    }
+}
 
 int PlatformStartup()
 {

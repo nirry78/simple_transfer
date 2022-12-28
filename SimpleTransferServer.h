@@ -4,7 +4,7 @@
 #include "Platform.h"
 #include "SimpleTransferConnection.h"
 
-class SimpleTransferServer: public Platform
+class SimpleTransferServer: public Platform, public SimpleTransferConnectionCallback
 {
     private:
         std::list<std::shared_ptr<SimpleTransferConnection>> mConnectionList;
@@ -13,6 +13,7 @@ class SimpleTransferServer: public Platform
         char                *mReceiverBuffer;
 
         bool                HandleClient();
+        virtual void        OnConnectionClose(std::shared_ptr<class SimpleTransferConnection>connection);
         bool                StartServer();
     public:
                             SimpleTransferServer();
