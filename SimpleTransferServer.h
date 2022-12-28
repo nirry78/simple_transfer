@@ -2,10 +2,12 @@
 #define __SIMPLE_TRANSFER_SERVER_H
 
 #include "Platform.h"
+#include "SimpleTransferConnection.h"
 
 class SimpleTransferServer: public Platform
 {
     private:
+        std::list<std::shared_ptr<SimpleTransferConnection>> mConnectionList;
         PlatformSocketType  mClientSocketHandle;
         PlatformSocketType  mSocketHandle;
         char                *mReceiverBuffer;

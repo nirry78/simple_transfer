@@ -65,7 +65,11 @@ bool SimpleTransferServer::StartServer()
     };
 #else
     sockaddr_in address = {
-        .sa_family = AF_INET,
+        .sin_family = AF_INET,
+        .sin_port = htons(4959),
+        .sin_addr = {
+            .s_addr = htonl(INADDR_ANY)
+        }
     };
 #endif
 
@@ -103,16 +107,32 @@ int SimpleTransferServer::Run(int argc, char **argv)
     for(;;)
     {
         sockaddr_in clientAddress;
-        int clientAddressLen = sizeof(clientAddress);
+        socklen_t clientAddressLen = sizeof(clientAddress);
 
         mClientSocketHandle = accept(mSocketHandle, (sockaddr *)&clientAddress, &clientAddressLen);
         if (mClientSocketHandle != PLATFORM_INVALID_SOCKET_HANDLE)
         {
+            try
+            {
+                std::shared_ptr<SimpleTransferConnection> simpleConnection = 
+                    std::make_shared<SimpleTransferConnection>(mClientSocketHandle);
+
+                mConnectionList.push_back(simpleConnection);
+            }
+            catch(const std::bad_alloc& e)
+            {
+
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+            }
+            
             std::cout << "Client connected" << std::endl;
             HandleClient();
             std::cout << "Client disconnected" << std::endl;
-            shutdown(mClientSocketHandle, SD_BOTH);
-            closesocket(mClientSocketHandle);
+            shutdown(mClientSocketHandle, PLATFORM_BOTH_DIRECTIONS);
+            PlatformCloseSocket(mClientSocketHandle);
         }
         else
         {
