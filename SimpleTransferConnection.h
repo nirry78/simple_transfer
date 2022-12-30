@@ -19,6 +19,7 @@ class SimpleTransferConnection: public Platform
         PlatformRecvResult                  mReceiveOffset;
         PlatformRecvResult                  mReceiveLength;
 
+        void    ProcessRequest(std::string &request);
         void    ProcessSocket();
     public:
                 SimpleTransferConnection(PlatformSocketType socketHandle,

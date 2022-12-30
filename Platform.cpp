@@ -59,6 +59,18 @@ void Platform::Log(PlatformErrorLevel errorLevel, const char *format, ...)
     }
 }
 
+void Platform::Log(const std::string_view message,
+                   const std::source_location location)
+{
+    std::clog << "file: "
+              << location.file_name() << "("
+              << location.line() << ":"
+              << location.column() << ") `"
+              << location.function_name() << "`: "
+              << message << std::endl;
+}
+
+
 int PlatformStartup()
 {
 

@@ -20,6 +20,7 @@ add_executable(SimpleTransferClient ${SRC_CLIENT})
 add_executable(SimpleTransferServer ${SRC_SERVER})
 add_executable(SimpleTransferTest ${SRC_TEST})
 
+set_property(TARGET SimpleTransferCommon PROPERTY CXX_STANDARD 20)
 set_property(TARGET SimpleTransferClient PROPERTY CXX_STANDARD 20)
 set_property(TARGET SimpleTransferServer PROPERTY CXX_STANDARD 20)
 set_property(TARGET SimpleTransferTest PROPERTY CXX_STANDARD 20)

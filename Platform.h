@@ -18,7 +18,10 @@
 #include <string>
 #include <list>
 #include <memory>
+#include <array>
 #include <thread>
+#include <string_view>
+#include <source_location>
 
 #ifdef _WIN32
 typedef SOCKET PlatformSocketType;
@@ -55,6 +58,8 @@ class Platform
         virtual         ~Platform();
 
         void            Log(PlatformErrorLevel errorLevel, const char *format, ...);
+        void            Log(const std::string_view message,
+                            const std::source_location location = std::source_location::current());
         void            SetVerbose();
 
 };

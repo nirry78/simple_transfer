@@ -29,9 +29,45 @@ SimpleTransferConnection::~SimpleTransferConnection()
     mThread->join();
 }
 
+void SimpleTransferConnection::ProcessRequest(std::string &request)
+{
+    std::list<std::string> fields;
+    std::string operation;
+    size_t offset = 0;
+    size_t position;
+
+    position = request.find_first_of('\r');
+    if (position != std::string::npos)
+    {
+        operation = request.substr(0, position);
+        offset = position + 2;
+    }
+    else
+    {
+        return;
+    }
+
+    while ((position = request.find_first_of('\r', offset)) != std::string::npos)
+    {
+        if (position - offset)
+        {
+            std::string field = request.substr(offset, position - offset);
+            fields.push_back(field);
+        }
+        offset = position + 2;
+    }
+
+    std::cout << "Operation: " << operation << std::endl;
+    for (auto field : fields)
+    {
+        std::cout << "Field: " << field << std::endl;
+    }
+}
+
 void SimpleTransferConnection::ProcessSocket()
 {
     Log(LOG_INFO, "Connection thread is running (socketHandle: %d)", mSocketHandle);
+
     for (;;)
     {
         PlatformRecvResult res = recv(mSocketHandle,
@@ -44,12 +80,15 @@ void SimpleTransferConnection::ProcessSocket()
 
             for (auto index = 0; index < mReceiveOffset; index++)
             {
-
+                if (mReceiveBuffer[index + 0] == '\r' &&
+                    mReceiveBuffer[index + 1] == '\n' &&
+                    mReceiveBuffer[index + 2] == '\r' &&
+                    mReceiveBuffer[index + 3] == '\n')
+                {
+                    std::string request(mReceiveBuffer.get(), index + 3);
+                    ProcessRequest(request);
+                }
             }
-
-            Log(LOG_VERBOSE, "Received %zd bytes", res);
-
-            std::cout << mReceiveBuffer.get() << std::endl;
         }
         else
         {
